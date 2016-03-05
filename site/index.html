@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Title of the document</title>
+</head>
+<body>
+<button type="button" id='gomb' >Trello latest actions</button> <br>
+<button type="button" id='db_button' >Couchbase testing</button> <br>
+<div id='myDiv'>ez egy div</div>
+<script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+<script src="https://api.trello.com/1/client.js?key=688c96f55f705bc0d73cc0d8a49da479"></script>
+<script src="js/authenticate.js" type="text/javascript"></script>
+<script src="js/latest_actions.js" type="text/javascript"></script>
+<script>
+
+var isAuthenticated = false;
+
+/*
+var getBoardInfo = function() {
+  // Get all of the information about the boards you have access to
+  var success = function(successMsg) {
+    asyncOutput(successMsg);
+  };
+  var error = function(errorMsg) {
+    asyncOutput(errorMsg);
+  };
+  Trello.get('/member/me/boards', success, error);
+};
+*/
+
+window.onload = function() {
+  console.log(isAuthenticated)
+  console.log("Is it working?")
+  console.log("YEAH...")
+  $('#gomb').click(getLatestActions);
+  $('#db_button').click(function() {
+    var couchbase = require('couchbase');
+    var cluster = new couchbase.Cluster('couchbase://127.0.0.1');
+    var bucket = cluster.openBucket('default');
+    cluster.disconnect();
+  });
+};
+
+</script>
+</body>
+</html> 
+
