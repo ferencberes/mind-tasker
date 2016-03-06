@@ -17,7 +17,7 @@ var getLatestActions = function() {
     asyncOutput(errorMsg);
   };
 
-  var response = Trello.get('/members/me/actions',actionsSuccess, actionsFailure);  
+  var response = Trello.get('/members/me/actions',actionsSuccess, actionsFailure);
 }
 
 var createNewEvent = function(eventObj) {
