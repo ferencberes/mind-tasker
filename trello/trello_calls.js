@@ -15,13 +15,21 @@ var secret = "";
 var loginCallback = "http://" + domain + ":" + port + "/callback";
 
 var oauth_secrets = {};
-var oauth = new OAuth(requestURL, accessURL, key, secret, "1.0", loginCallback, "HMAC-SHA1");
+var oauth = "";
 
 var token = "";
 var tokenSecret = "";
 var verifier = "";
 
+exports.Init = function(mySecret) {
+  secret = mySecret;
+  oauth = new OAuth(requestURL, accessURL, key, secret, "1.0", loginCallback, "HMAC-SHA1");
+  //console.log(secret);
+};
+
 exports.login = function(req, res, next) {
+  console.log('LOGIN NOW')
+  //console.log(secret)
   return oauth.getOAuthRequestToken((function(_this) {
     return function(error, token, tokenSecret, results) {
       oauth_secrets[token] = tokenSecret;
@@ -53,17 +61,19 @@ exports.callback = function(req, res, next) {
   next();
 };
 
-exports.getLatestActions = function(req, res, next) {
-	if (token == "") {
+exports.syncLatestActions = function(req, res, next) {
+  
+  if (token == "") {
 		console.log('Token is not initialized. REDIRECT for /login');
 		res.redirect('/login');
 	} else {
 		return oauth.getOAuthAccessToken(token, tokenSecret, verifier, function(error, accessToken, accessTokenSecret, results) {
     		return oauth.getProtectedResource("https://api.trello.com/1/members/me/actions", "GET", accessToken, accessTokenSecret, function(error, data, response) {
             couchbase.insertNewEvents(data);
-      			return res.end(data);
     		});
   		});
 	};
-  	next();
+  res.alma = "ALMA";
+  console.log('New events were synchronized with database.');
+  next();
 };

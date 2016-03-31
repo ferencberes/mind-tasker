@@ -1,0 +1,1 @@
+<h2><%= action.date %></h2>
