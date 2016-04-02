@@ -34,7 +34,7 @@ exports.getLatestActions = function (req, res, next, skip, limit) {
 			console.log(err);
 		} else {
 			//console.log(results);
-			res.render('new',{actions : results});
+			res.render('new',{title: 'New Events', actions : results});
 			console.log('Latest actions were rendered: skip=' + skip + ', limit=' + limit);
 		};
 	});

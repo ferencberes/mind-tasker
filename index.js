@@ -3,16 +3,21 @@ var trello = require('./trello/trello_calls');
 var my_couchbase = require('./couchbase/couchbase_calls');
 
 var app = express()
+var is_initialized = false;
+app.use(express.static('public'));
 app.set('view engine','ejs');
 
 var port = process.argv[3]
 
 app.get('/', function (req, res, next) {
 	// configure custom modules
-	trello.Init(process.argv[2]);
-	my_couchbase.Init();
-	console.log('Initializations finished.');
-	res.render('index', {title : 'MindTasker trials'});
+	if (!is_initialized) {
+		trello.Init(process.argv[2]);
+		my_couchbase.Init();
+		is_initialized = true;
+		console.log('Moduls were initialized.');
+	}
+	res.render('index', {title : 'Dashboard'});
 });
 
 app.get('/new', function (req, res, next) {
@@ -27,17 +32,17 @@ app.get('/new', function (req, res, next) {
 
 app.get('/local', function (req, res, next) {
 	console.log("GET /local");
-	res.send('List of all locally stored event...');
+	res.render('index', {title : 'Local Events'});
 });
 
 app.get('/upcoming', function (req, res, next) {
 	console.log("GET /upcoming");
-	res.send('List of all upcoming events...'
-)});
+	res.render('index', {title : 'Upcoming Events'});
+});
 
 app.get('/trash', function (req, res, next) {
 	console.log("GET /trash");
-	res.send('List of all trashed events...')
+	res.render('index', {title : 'Trash'});
 });
 
 app.get('/login', function (req, res, next) {
