@@ -73,7 +73,6 @@ exports.syncLatestActions = function(req, res, next) {
     		});
   		});
 	};
-  res.alma = "ALMA";
   console.log('New events were synchronized with database.');
   next();
 };

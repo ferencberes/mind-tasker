@@ -1,10 +1,12 @@
 var couchbase = require('couchbase');
+var N1qlQuery = require('couchbase').N1qlQuery;
+var ViewQuery = couchbase.ViewQuery;
 
 var bucket, cluster, lastUpdate;
 
 exports.Init = function() {
 	cluster = new couchbase.Cluster('couchbase://127.0.0.1');
-	bucket = cluster.openBucket('default');
+	bucket = cluster.openBucket('trello-actions');
 };
 
 exports.insertNewEvents = function (data_str) {
@@ -23,13 +25,17 @@ exports.insertNewEvents = function (data_str) {
 	console.log(lastUpdate);
 };
 
-exports.getLatestActions = function (req, res, next) {
-	var begin_skip = 0;
-	var limit_num = 10;
-	var query = couchbase.ViewQuery.from('default', 'ID').skip(begin_skip).limit(limit_num);
+exports.getLatestActions = function (req, res, next, skip, limit) {
+	if (skip === undefined) { skip = 0;}
+	if (limit === undefined) { limit = 5;}
+	var query = ViewQuery.from('dev_trello_action_view','trello_latest_actions').skip(skip).limit(limit);
 	bucket.query(query, function(err, results) {
-		res.actions = results; // if null then set 404 status
+		if (err) {
+			console.log(err);
+		} else {
+			//console.log(results);
+			res.render('new',{actions : results});
+			console.log('Latest actions were rendered: skip=' + skip + ', limit=' + limit);
+		};
 	});
-	console.log('Latest actions were queried.')
-	next();
 };

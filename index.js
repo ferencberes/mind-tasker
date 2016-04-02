@@ -1,28 +1,29 @@
 var express = require('express')
-//var trello = require('./trello/trello_utils')
 var trello = require('./trello/trello_calls');
 var my_couchbase = require('./couchbase/couchbase_calls');
 
 var app = express()
-
 app.set('view engine','ejs');
-//app.use(express.bodyParser());
 
 var port = process.argv[3]
-trello.Init(process.argv[2]);
 
 app.get('/', function (req, res, next) {
 	// configure custom modules
+	trello.Init(process.argv[2]);
 	my_couchbase.Init();
+	console.log('Initializations finished.');
 	res.render('index', {title : 'MindTasker trials'});
 });
 
 app.get('/new', function (req, res, next) {
 	console.log("GET /new");
-	trello.syncLatestActions(req, res, next);
-	my_couchbase.getLatestActions(req, res, next);
-	console.log(res.actions);
-}, function(req, res) { res.sendStatus(200); });
+	//trello.syncLatestActions(req, res, next);
+	next();
+}, function(req, res, next) {
+	var skip = req.query.skip;
+	var limit = req.query.limit;
+	my_couchbase.getLatestActions(req, res, next, skip, limit);
+});
 
 app.get('/local', function (req, res, next) {
 	console.log("GET /local");
