@@ -12,7 +12,7 @@ var port = process.argv[3]
 app.get('/', function (req, res, next) {
 	// configure custom modules
 	if (!is_initialized) {
-		trello.Init(process.argv[2]);
+		trello.Init(process.argv[2], port);
 		my_couchbase.Init();
 		is_initialized = true;
 		console.log('Moduls were initialized.');
@@ -20,9 +20,9 @@ app.get('/', function (req, res, next) {
 	res.render('index', {title : 'Dashboard'});
 });
 
-app.get('/new', function (req, res, next) {
+app.get('/new', trello.login, function (req, res, next) {
 	console.log("GET /new");
-	//trello.syncLatestActions(req, res, next);
+	trello.syncLatestActions(req, res, next);
 	next();
 }, function(req, res, next) {
 	var skip = req.query.skip;
@@ -43,11 +43,6 @@ app.get('/upcoming', function (req, res, next) {
 app.get('/trash', function (req, res, next) {
 	console.log("GET /trash");
 	res.render('index', {title : 'Trash'});
-});
-
-app.get('/login', function (req, res, next) {
-	console.log("GET /login");
-	trello.login(req, res, next);
 });
 
 app.get('/callback', function (req, res, next) {
