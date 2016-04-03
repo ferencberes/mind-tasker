@@ -32,7 +32,9 @@ app.get('/new', trello.login, function (req, res, next) {
 
 app.get('/local', function (req, res, next) {
 	console.log("GET /local");
-	res.render('index', {title : 'Local Events'});
+	var skip = req.query.skip;
+	var limit = req.query.limit;
+	my_couchbase.getLocalActions(req, res, next, skip, limit);
 });
 
 app.get('/upcoming', function (req, res, next) {
@@ -42,12 +44,33 @@ app.get('/upcoming', function (req, res, next) {
 
 app.get('/trash', function (req, res, next) {
 	console.log("GET /trash");
-	res.render('index', {title : 'Trash'});
+	var skip = req.query.skip;
+	var limit = req.query.limit;
+	my_couchbase.getTrashActions(req, res, next, skip, limit);
 });
 
 app.get('/callback', function (req, res, next) {
 	console.log("GET /callback");
 	trello.callback(req, res, next);
+});
+
+app.param('action_id', my_couchbase.exists_id);
+
+app.param('action_status', my_couchbase.exists_status);
+
+app.get('/update/:action_id/move/:action_status', function (req, res, next) {
+	console.log("UPDATE /move");
+	var id = req.params.action_id;
+	var status = req.params.action_status; 
+	console.log('Action ' + id + ' was moved to /' + status);
+	res.end();
+});
+
+app.get('/update/:action_id/reset', function (req, res, next) {
+	console.log("UPDATE /reset");
+	var id = req.params.action_id;
+	console.log('Action ' + id + ' was reset.');
+	res.end();
 });
 
 var server = app.listen(port, function() {
