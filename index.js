@@ -54,23 +54,25 @@ app.get('/callback', function (req, res, next) {
 	trello.callback(req, res, next);
 });
 
-app.param('action_id', my_couchbase.exists_id);
+app.param('action_id', my_couchbase.existsId);
 
-app.param('action_status', my_couchbase.exists_status);
+app.param('action_status', my_couchbase.existsStatus);
 
 app.get('/update/:action_id/move/:action_status', function (req, res, next) {
 	console.log("UPDATE /move");
 	var id = req.params.action_id;
 	var status = req.params.action_status; 
-	console.log('Action ' + id + ' was moved to /' + status);
-	res.end();
+	my_couchbase.moveAction(req, res, next, id, status);
+	//console.log('Action ' + id + ' was moved to /' + status);
+	//res.end();
 });
 
 app.get('/update/:action_id/reset', function (req, res, next) {
 	console.log("UPDATE /reset");
 	var id = req.params.action_id;
-	console.log('Action ' + id + ' was reset.');
-	res.end();
+	my_couchbase.resetAction(req, res, next, id);
+	//console.log('Action ' + id + ' was reset.');
+	//res.end();
 });
 
 var server = app.listen(port, function() {
