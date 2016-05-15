@@ -12,6 +12,7 @@ exports.Init = function() {
 
 var idExistsPromise = function(action_id) {
 	return new Promise(function (resolve, reject) {
+		bucket = cluster.openBucket('trello-actions');
 		bucket.get(action_id, function(err, result) {
 			if (err) {
 				reject(err);
@@ -48,6 +49,28 @@ exports.existsStatus = function(req, res, next, status) {
 
 var syncNewEvent = function(action_str) {
 	action_id = "tr_" + action_str["id"];
+	//upsertAction(action_id, action_str, 'trello', 'new', 'new');
+	bucket.get(action_id,function(err, result) {
+		if (err) {
+			console.log('insert');
+			upsertAction(action_id, action_str, 'trello', 'new', 'new');
+		} else {
+			console.log('replace');
+			new_doc = result.value;
+			//console.log(new_doc);
+			cur_cas = result.cas;
+			//console.log(cur_cas);
+			new_doc['content'] = action_str;
+			new_doc['date'] = action_str['date'];
+			bucket.replace(action_id,new_doc,cas=cur_cas,function(err, result) {
+  				if (err) { 
+  					console.log(err);
+  					throw err;
+  				}
+			});
+		};
+	});
+	/*
 	idExistsPromise(action_id).then(
 		function(action) {
 			console.log('upsert');
@@ -58,6 +81,7 @@ var syncNewEvent = function(action_str) {
 			upsertAction(action_id, action_str, 'trello', 'new', 'new');
 		}
 	).catch(function(e){console.error(e);});
+	*/
 };
 
 var upsertAction = function(id, action_str, service_str, status_str, old_status_str) {
@@ -72,14 +96,12 @@ var upsertAction = function(id, action_str, service_str, status_str, old_status_
 
 exports.insertNewEvents = function (data_str) {
 	var data_json = JSON.parse(data_str);
-	var currentUpdate = data_json[0]["date"];
-	// store 'lastUpdate' in database ad check with break whether there is new info... 
 	for (idx in data_json) {
 		action = data_json[idx];
-		syncNewEvent(action);
+		console.log(idx);
+		//syncNewEvent(action);
+		//break;
 	};
-	lastUpdate = currentUpdate;
-	console.log(lastUpdate);
 };
 
 var updateAction = function (req, res, next, id, action, changes) {
