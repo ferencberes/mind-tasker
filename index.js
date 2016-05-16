@@ -1,6 +1,5 @@
 var express = require('express')
 var trello = require('./trello/trello_calls');
-//var my_mongo = require('./couchbase/couchbase_calls');
 var my_mongo = require('./mongo/mongo_calls');
 
 var app = express()
@@ -8,14 +7,15 @@ var is_initialized = false;
 app.use(express.static('public'));
 app.set('view engine','ejs');
 
-var oauth_secret = process.argv[2]
-var mongo_port = process.argv[3]
-var server_port = process.argv[4]
+var api_key = process.argv[2]
+var oauth_secret = process.argv[3]
+var mongo_port = process.argv[4]
+var server_port = process.argv[5]
 
 app.get('/', function (req, res, next) {
 	// configure custom modules
 	if (!is_initialized) {
-		trello.Init(oauth_secret, server_port);
+		trello.Init(oauth_secret, api_key, server_port);
 		my_mongo.Init(mongo_port);
 		is_initialized = true;
 		console.log('Moduls were initialized.');

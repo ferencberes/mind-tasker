@@ -11,7 +11,7 @@ var port = "";
 var secret = "";
 var loginCallback = "";
 var appName = "Mind-Tasker";
-var key = "688c96f55f705bc0d73cc0d8a49da479";
+var key = "";
 
 var oauth_secrets = {};
 var oauth = "";
@@ -19,13 +19,13 @@ var token = "";
 var tokenSecret = "";
 var verifier = "";
 
-exports.Init = function(mySecret, myPort) {
+exports.Init = function(mySecret, myKey, myPort) {
   domain = "127.0.0.1";
   port = myPort;
   loginCallback = "http://" + domain + ":" + port + "/callback";
   secret = mySecret;
+  key = myKey;
   oauth = new OAuth(requestURL, accessURL, key, secret, "1.0", loginCallback, "HMAC-SHA1");
-  //console.log(secret);
 };
 
 exports.login = function(req, res, next) {

@@ -1,4 +1,5 @@
 var mongoose = require('mongoose');
+var async = require('async');
 
 var Events
 
@@ -43,11 +44,15 @@ exports.existsStatus = function(req, res, next, status) {
 
 exports.insertNewEvents = function (data_str) {
 	var data_json = JSON.parse(data_str);
-	for (idx in data_json) {
-		action = data_json[idx];
-		console.log(idx);
-		upsertAction(action);
-	};
+	// serial for loop
+	(function myLoop (i) {          
+   		setTimeout(function () {             
+      		if (--i) {
+				upsertAction(data_json[i])      
+      			myLoop(i);
+      		}
+      	}, 50)
+	})(data_json.length);
 };
 
 // Event operations
