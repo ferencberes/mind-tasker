@@ -1,6 +1,6 @@
 var OAuth = require('oauth').OAuth;
 var url = require('url');
-var couchbase = require('../couchbase/couchbase_calls');
+var my_mongo = require('../mongo/mongo_calls');
 
 var requestURL = "https://trello.com/1/OAuthGetRequestToken";
 var accessURL = "https://trello.com/1/OAuthGetAccessToken";
@@ -60,15 +60,15 @@ exports.callback = function(req, res, next) {
     });
   });
   */
-  console.log('REDIRECT for /new');
-  res.redirect('/new');
+  console.log('REDIRECT for /sync');
+  res.redirect('/sync');
   next();
 };
 
 exports.syncLatestActions = function(req, res, next) {
 	return oauth.getOAuthAccessToken(token, tokenSecret, verifier, function(error, accessToken, accessTokenSecret, results) {
   	return oauth.getProtectedResource("https://api.trello.com/1/members/me/actions", "GET", accessToken, accessTokenSecret, function(error, data, response) {
-        couchbase.insertNewEvents(data);
+        my_mongo.insertNewEvents(data);
    	});
   });
   console.log('New events were synchronized with database.');
