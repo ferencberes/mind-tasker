@@ -1,0 +1,14 @@
+<tr class="trash-event-item">
+	<td> <%=action._id%> </td>
+	<td> <%=action.date%> </td>
+	<td><i class="fa fa-trello fa-2x"></i></td>
+	<td> <%=action.content.data.card.name%> </td>
+	<td> 
+		<a class="btn btn-warning" href="update/<%=action.id%>/reset">
+  			<i class="fa fa-undo fa-lg"></i> Reset
+  		</a> 
+		<a class="btn btn-danger" href="update/<%=action.id%>/remove">
+  			<i class="fa fa-trash-o fa-lg"></i> Delete
+  		</a>
+  	</td>
+</tr>

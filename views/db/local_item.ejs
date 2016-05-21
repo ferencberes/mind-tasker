@@ -1,0 +1,14 @@
+<tr class="local-event-item">
+	<td> <%=action._id%> </td>
+	<td> <%=action.date%> </td>
+	<td><i class="fa fa-trello fa-2x"></i></td>
+	<td> <%=action.content.data.card.name%> </td>
+	<td> 
+		<a class="btn btn-primary" href="update/<%=action.id%>/move/new">
+  			<i class="fa fa-newspaper-o fa-lg"></i> New
+  		</a> 
+		<a class="btn btn-danger" href="update/<%=action.id%>/move/trash">
+  			<i class="fa fa-trash-o fa-lg"></i> Delete
+  		</a>
+  	</td>
+</tr>

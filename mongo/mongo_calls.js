@@ -5,7 +5,7 @@ var Events
 
 exports.Init = function(mongo_port) {
 	mongoose.connect('mongodb://localhost:' +  mongo_port + '/mind-tasker');
-	Events = mongoose.model('Events', {_id: String, date: String, service: String, status: String, String: String, content: Object});
+	Events = mongoose.model('Events', {_id: String, date: String, service: String, status: String, old_status : String, content: Object});
 };
 
 var idExistsPromise = function(action_id) {
@@ -89,22 +89,33 @@ var upsertAction = function(action_str) {
 
 exports.moveAction = function (req, res, next, id, new_status) {
 	Events.findOne({'_id': id }, function (err, action) {
+		if (err) { console.log(err);}
 		action.old_status = action.status
 		action.status = new_status
 		action.save();
 	});
 	console.log('Action ' + id + ' was moved to /' + new_status);
-	res.end();
+	res.redirect(req.get('referer'));
 };
 
 exports.resetAction = function (req, res, next, id) {
 	Events.findOne({'_id': id }, function (err, action) {
+		if (err) { console.log(err);}
 		action.status = action.old_status
 		action.save();
 	});
 	console.log('Action ' + id + ' was reset.');
-	res.end();
+	res.redirect(req.get('referer'));
 };
+
+exports.removeAction = function (req, res, next, id) {
+	Events.findOne({'_id': id }, function (err, action) {
+		if (err) { console.log(err);}
+		action.remove();
+	});
+	console.log('Action ' + id + ' was removed.');
+	res.redirect(req.get('referer'));
+}
 
 // View handler functions
 
@@ -132,7 +143,7 @@ exports.getLatestActions = function (req, res, next, skip, limit) {
 	var query = Events.find({ 'status': 'new' }).sort({date : -1}).skip(skip).limit(limit);
 	query.exec(function(err, results) {
 		if (err) { console.log(err);}
-		res.render('base_action_list',{title: 'New Events', actions : results});
+		res.render('new',{title: 'New Events', actions : results});
 	});
 };
 
@@ -146,7 +157,7 @@ exports.getLocalActions = function (req, res, next, skip, limit) {
 			res.sendStatus(500);
 		} else {
 			//console.log(results);
-			res.render('base_action_list',{title: 'Local Events', actions : results});
+			res.render('local',{title: 'Local Events', actions : results});
 			console.log('Local actions were rendered: skip=' + skip + ', limit=' + limit);
 		};
 	});
@@ -162,7 +173,7 @@ exports.getTrashActions = function (req, res, next, skip, limit) {
 			res.sendStatus(500);
 		} else {
 			//console.log(results);
-			res.render('base_action_list',{title: 'Trash', actions : results});
+			res.render('trash',{title: 'Trash', actions : results});
 			console.log('Trash actions were rendered: skip=' + skip + ', limit=' + limit);
 		};
 	});

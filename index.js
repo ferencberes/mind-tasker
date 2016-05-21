@@ -77,6 +77,12 @@ app.get('/update/:action_id/reset', function (req, res, next) {
 	my_mongo.resetAction(req, res, next, id);
 });
 
+app.get('/update/:action_id/remove', function (req, res, next) {
+	console.log("UPDATE /remove");
+	var id = req.params.action_id;
+	my_mongo.removeAction(req, res, next, id);
+});
+
 app.get('/cards/:card_id', function (req, res, next) {
 	var card_id = req.params.card_id;
 	trello.getTrelloCard(req, res, next, card_id);
