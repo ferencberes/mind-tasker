@@ -57,6 +57,10 @@ exports.insertNewEvents = function (data_str) {
 
 // Event operations
 
+var strToDate = function (str_date) {
+	return str_date.substring(0,10) + " " + str_date.substring(11,19);
+}
+
 var upsertAction = function(action_str) {
 	action_id = "tr_" + action_str["id"];
 	Events.count({'_id': action_id }, function (err, count) {
@@ -65,13 +69,13 @@ var upsertAction = function(action_str) {
   		if (count>0) {
   			console.log('upsert');
   			Events.findOne({'_id': action_id }, function (err, action) {
-				action.date = action_str.date;
+				action.date = strToDate(action_str.date);
 				action.content = action_str;
 				action.save();
 			});
   		} else {
   			console.log('insert');
-  			var new_event = new Events({_id: action_id, date: action_str.date, service: 'trello', status: 'new', old_status: 'new', content: action_str})
+  			var new_event = new Events({_id: action_id, date: strToDate(action_str.date), service: 'trello', status: 'new', old_status: 'new', content: action_str})
 			new_event.save(function (err) {
   				if (err) {
     			console.log(err);
@@ -104,26 +108,38 @@ exports.resetAction = function (req, res, next, id) {
 
 // View handler functions
 
+var getSkipValue = function (skip) {
+	if (skip === undefined) { 
+		skip = 0;
+	} else { 
+		skip = parseInt(skip);
+	}
+	return skip;
+}
+
+var getLimitValue = function (limit) {
+	if (limit === undefined) { 
+		limit = 10;
+	} else { 
+		limit = parseInt(limit);
+	}
+	return limit;
+}
+
 exports.getLatestActions = function (req, res, next, skip, limit) {
-	if (skip === undefined) { skip = 0;}
-	if (limit === undefined) { limit = 5;}
-	var query = Events.find({ 'status': 'new' })./*sort({date : -1}).*/skip(skip).limit(limit);
+	skip = getSkipValue(skip);
+	limit = getLimitValue(limit);
+	var query = Events.find({ 'status': 'new' }).sort({date : -1}).skip(skip).limit(limit);
 	query.exec(function(err, results) {
-		if (err) {
-			console.log(err);
-			res.sendStatus(500);
-		} else {
-			//console.log(results[0]['content'])
-			res.render('base_action_list',{title: 'New Events', actions : results});
-			console.log('Latest actions were rendered: skip=' + skip + ', limit=' + limit);
-		};
+		if (err) { console.log(err);}
+		res.render('base_action_list',{title: 'New Events', actions : results});
 	});
 };
 
 exports.getLocalActions = function (req, res, next, skip, limit) {
-	if (skip === undefined) { skip = 0;}
-	if (limit === undefined) { limit = 5;}
-	var query = Events.find({ 'status': 'local' })./*sort({date : -1}).*/skip(skip).limit(limit);
+	skip = getSkipValue(skip);
+	limit = getLimitValue(limit);
+	var query = Events.find({ 'status': 'local' }).sort({date : -1}).skip(skip).limit(limit);
 	query.exec(function(err, results) {
 		if (err) {
 			console.log(err);
@@ -137,9 +153,9 @@ exports.getLocalActions = function (req, res, next, skip, limit) {
 };
 
 exports.getTrashActions = function (req, res, next, skip, limit) {
-	if (skip === undefined) { skip = 0;}
-	if (limit === undefined) { limit = 5;}
-	var query = Events.find({ 'status': 'trash' })./*sort({date : -1}).*/skip(skip).limit(limit);
+	skip = getSkipValue(skip);
+	limit = getLimitValue(limit);
+	var query = Events.find({ 'status': 'trash' }).sort({date : -1}).skip(skip).limit(limit);
 	query.exec(function(err, results) {
 		if (err) {
 			console.log(err);

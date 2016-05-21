@@ -77,6 +77,11 @@ app.get('/update/:action_id/reset', function (req, res, next) {
 	my_mongo.resetAction(req, res, next, id);
 });
 
+app.get('/cards/:card_id', function (req, res, next) {
+	var card_id = req.params.card_id;
+	trello.getTrelloCard(req, res, next, card_id);
+});
+
 var server = app.listen(server_port, function() {
 	console.log('MindTasker is running on server_port ' + server_port);
 });

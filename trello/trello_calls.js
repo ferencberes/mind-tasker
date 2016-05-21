@@ -74,3 +74,12 @@ exports.syncLatestActions = function(req, res, next) {
   console.log('New events were synchronized with database.');
   next();
 };
+
+exports.getTrelloCard = function(req, res, next, id) {
+  return oauth.getOAuthAccessToken(token, tokenSecret, verifier, function(error, accessToken, accessTokenSecret, results) {
+    return oauth.getProtectedResource("https://api.trello.com/1/cards/" + id, "GET", accessToken, accessTokenSecret, function(error, data, response) {
+        console.log(data);
+    });
+  });
+  next();
+};
