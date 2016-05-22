@@ -1,8 +1,8 @@
-<tr class="trash-event-item">
+<tr class="trash-event-item" href="<%=action.content.url%>">
 	<td> <%=action._id%> </td>
 	<td> <%=action.date%> </td>
 	<td><i class="fa fa-trello fa-2x"></i></td>
-	<td> <%=action.content.data.card.name%> </td>
+	<td> <%=action.content.name%> </td>
 	<td> 
 		<a class="btn btn-warning" href="update/<%=action.id%>/reset">
   			<i class="fa fa-undo fa-lg"></i> Reset

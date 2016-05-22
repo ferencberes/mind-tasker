@@ -68,11 +68,39 @@ exports.callback = function(req, res, next) {
 exports.syncLatestActions = function(req, res, next) {
 	return oauth.getOAuthAccessToken(token, tokenSecret, verifier, function(error, accessToken, accessTokenSecret, results) {
   	return oauth.getProtectedResource("https://api.trello.com/1/members/me/actions", "GET", accessToken, accessTokenSecret, function(error, data, response) {
-        my_mongo.insertNewEvents(data);
+        var data_json = JSON.parse(data);
+        for (card_id in get_card_ids(data_json)) {
+          //console.log(card_id);
+          oauth.getProtectedResource("https://api.trello.com/1/cards/" + card_id, "GET", accessToken, accessTokenSecret, function(error, card_str, response) {
+            try {
+              card = JSON.parse(card_str);
+              if ('id' in card) {
+                card_wrapper = {'id':card.id, 'date':card.dateLastActivity, 'name':card.name, 'url':card.shortUrl};
+                //console.log(card_wrapper);
+                my_mongo.upsertAction(card_wrapper, "tr_" + card.id, "trello");
+              }; 
+            } catch (e) {
+              console.log('Resource not available.');
+            };
+          });
+        };
    	});
   });
   console.log('New events were synchronized with database.');
   next();
+};
+
+var get_card_ids = function (data_json) {
+  var card_ids = {};
+  for (idx in data_json) {
+    if ('card' in data_json[idx]['data']) {
+      card_id = data_json[idx]['data']['card']['id'];
+      //console.log(card_id);
+      card_ids[card_id] = "1";
+    }
+  };
+  //console.log(card_ids);
+  return card_ids;
 };
 
 exports.getTrelloCard = function(req, res, next, id) {

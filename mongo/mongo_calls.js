@@ -42,8 +42,8 @@ exports.existsStatus = function(req, res, next, status) {
 	}
 };
 
-exports.insertNewEvents = function (data_str) {
-	var data_json = JSON.parse(data_str);
+/*
+exports.insertNewEvents = function (data_json) {
 	// serial for loop
 	(function myLoop (i) {          
    		setTimeout(function () {             
@@ -54,6 +54,7 @@ exports.insertNewEvents = function (data_str) {
       	}, 50)
 	})(data_json.length);
 };
+*/
 
 // Event operations
 
@@ -61,21 +62,21 @@ var strToDate = function (str_date) {
 	return str_date.substring(0,10) + " " + str_date.substring(11,19);
 }
 
-var upsertAction = function(action_str) {
-	action_id = "tr_" + action_str["id"];
+exports.upsertAction = function(action_json, action_id, service_name) {
+	//action_id = "tr_" + action_json["id"];
 	Events.count({'_id': action_id }, function (err, count) {
   		if (err) console.log(err);
 
   		if (count>0) {
   			console.log('upsert');
   			Events.findOne({'_id': action_id }, function (err, action) {
-				action.date = strToDate(action_str.date);
-				action.content = action_str;
+				action.date = strToDate(action_json.date);
+				action.content = action_json;
 				action.save();
 			});
   		} else {
   			console.log('insert');
-  			var new_event = new Events({_id: action_id, date: strToDate(action_str.date), service: 'trello', status: 'new', old_status: 'new', content: action_str})
+  			var new_event = new Events({_id: action_id, date: strToDate(action_json.date), service: service_name, status: 'new', old_status: 'new', content: action_json})
 			new_event.save(function (err) {
   				if (err) {
     			console.log(err);
