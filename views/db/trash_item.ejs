@@ -1,13 +1,13 @@
-<tr class="trash-event-item" href="<%=action.content.url%>">
+<tr class="event-item" id="<%=action._id%>" href="<%=action.content.url%>">
 	<td> <%=action._id%> </td>
 	<td> <%=action.date%> </td>
 	<td><i class="fa fa-trello fa-2x"></i></td>
 	<td> <%=action.content.name%> </td>
 	<td> 
-		<a class="btn btn-warning" href="update/<%=action.id%>/reset">
+		<a class="reset-btn btn btn-warning">
   			<i class="fa fa-undo fa-lg"></i> Reset
   		</a> 
-		<a class="btn btn-danger" href="update/<%=action.id%>/remove">
+		<a class="remove-btn btn btn-danger" >
   			<i class="fa fa-trash-o fa-lg"></i> Delete
   		</a>
   	</td>
